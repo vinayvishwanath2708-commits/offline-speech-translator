@@ -75,6 +75,9 @@ class _TranslatePageState extends State<TranslatePage> {
     await _tts.setSpeechRate(0.5);
     await _tts.setVolume(1.0);
 
+    // 🔥 REQUIRED FOR REALTIME MODE
+    await _tts.awaitSpeakCompletion(true);
+
     setState(() {
       detectedText = "Tap mic to start";
       _isLoading = false;
@@ -123,7 +126,7 @@ class _TranslatePageState extends State<TranslatePage> {
     }
   }
 
-  // ================= DISPOSE VOSK SAFELY =================
+  // ================= DISPOSE VOSK =================
 
   Future<void> _disposeVosk() async {
     if (_speech != null) {
@@ -191,22 +194,33 @@ class _TranslatePageState extends State<TranslatePage> {
     _speak(result);
   }
 
-  // ================= TEXT TO SPEECH =================
+  // ================= REALTIME TEXT TO SPEECH =================
 
   Future<void> _speak(String text) async {
     if (text.isEmpty) return;
 
     _isSpeaking = true;
 
+    // Stop listening before speaking
     if (_isListening) {
       await _speech?.stop();
       _isListening = false;
     }
 
     await _tts.setLanguage(tgtLang);
+
+    // Wait until speech completes
     await _tts.speak(text);
 
     _isSpeaking = false;
+
+    // 🔥 AUTOMATICALLY RESTART LISTENING
+    if (_speech != null) {
+      await _speech!.start();
+      setState(() {
+        _isListening = true;
+      });
+    }
   }
 
   // ================= LANGUAGE SWITCH =================
@@ -222,7 +236,7 @@ class _TranslatePageState extends State<TranslatePage> {
     await _initializeTranslator();
   }
 
-  // ================= LANGUAGE MAPPING =================
+  // ================= LANGUAGE MAP =================
 
   TranslateLanguage _getLanguage(String code) {
     switch (code) {
