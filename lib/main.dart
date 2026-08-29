@@ -6,6 +6,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:convert';
 import 'dart:io';
 
+// Updated recently
+
 void main() {
   runApp(const OfflineTranslatorApp());
 }
@@ -84,7 +86,7 @@ class _TranslatePageState extends State<TranslatePage> {
     });
   }
 
-  // ================= LOAD VOSK MODEL =================
+  // ================= LOAD VOSK MODEL
 
   Future<void> _loadVoskModel(String languageCode) async {
     try {
